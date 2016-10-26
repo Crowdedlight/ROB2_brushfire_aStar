@@ -5,6 +5,12 @@
 Enviroment::Enviroment(Image* img)
 {
     map = img;
+
+    inputMap = new Image();  
+    memcpy(inputMap, img, sizeof(Image));
+
+    waveNodeMap = new Image();
+    memcpy(waveNodeMap, img, sizeof(Image));
 }
 
 void Enviroment::brushFireError()
@@ -97,7 +103,7 @@ list<pixel> Enviroment::wavesMeet()
             //check for bigger neighbours
             int val = map->getPixelValuei(i, j, 0);
             
-            if (val != 0 && !hasLargerNeighbor8(i, j, val))
+            if (val != 0 && !hasLargerNeighbor(i, j, val))
             {
                 pixel point(i, j);
                 wavesMeet.push_back(point);
@@ -110,6 +116,7 @@ list<pixel> Enviroment::wavesMeet()
     for (auto p : wavesMeet)
     {
         map->setPixel8U(p.x, p.y, 255);
+        waveNodeMap->setPixel8U(p.x, p.y, 255);
     }
 
     return wavesMeet;
@@ -244,6 +251,16 @@ void Enviroment::print()
     }
 }
 
+void Enviroment::saveInternMaps()
+{
+    //Saves wavesMap and other saved maps to their output files. 
+    waveNodeMap->saveAsPGM("waveNodeMap.pgm");
+    inputMap->saveAsPGM("inputImage.pgm");
+}
+
 Enviroment::~Enviroment()
 {
+    //Clean up
+    delete inputMap;
+    delete waveNodeMap;
 }

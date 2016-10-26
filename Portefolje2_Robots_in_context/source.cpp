@@ -13,7 +13,7 @@ using namespace rw::loaders;
 
 
 int main(int argc) { 
-    std::string filename("testout.pgm");
+    std::string filename("map.pgm");
     std::cout << "loading image..." << std::endl;
     Image* img = PPMLoader::load(filename);
 
@@ -26,7 +26,7 @@ int main(int argc) {
 
     std::cout << "Running Brushfire..." << std::endl;
 
-    //env.brushFire();
+    env.brushFire();
     //env.print();
 
     list<pixel> wavesMeet = env.wavesMeet();
@@ -34,6 +34,9 @@ int main(int argc) {
     std::cout << std::endl << "saving image..." << std::endl;
     // save image
     img->saveAsPGM("testout2.pgm");
+
+    //Save other internal maps
+    env.saveInternMaps();
         
     // cleanup
     delete img;

@@ -29,11 +29,15 @@ public:
 
     void brushFireError();
 
+    void saveInternMaps();
+
 
     ~Enviroment();
 
 private:
     Image* map;
+    Image* inputMap;
+    Image* waveNodeMap;
 
     list<pixel> getAllNeighbors(int x, int y);
     bool differentNeighbors(int i, int j);
