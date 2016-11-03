@@ -4,13 +4,9 @@
 
 Enviroment::Enviroment(Image* img)
 {
-    map = img;
-
-    inputMap = new Image();  
-    memcpy(inputMap, img, sizeof(Image));
-
-    waveNodeMap = new Image();
-    memcpy(waveNodeMap, img, sizeof(Image));
+	inputMap = img;
+	brushfireMap = img->copyFlip(false,false);
+	waveNodeMap = img->copyFlip(false, false);
 }
 
 void Enviroment::brushFireError()
@@ -19,18 +15,18 @@ void Enviroment::brushFireError()
     do
     {
         changedPixel = false;
-        for (int i = 0; i < map->getWidth(); i++)
+        for (int i = 0; i < brushfireMap->getWidth(); i++)
         {
-            for (int j = 0; j < map->getHeight(); j++)
+            for (int j = 0; j < brushfireMap->getHeight(); j++)
             {
-                if (map->getPixelValuei(i, j, 0) != 0)
+                if (brushfireMap->getPixelValuei(i, j, 0) != 0)
                 {
                     //check neighbors if different from 255
                     if (differentNeighbors(i, j))
                     {
                         //Set value smallest neighbor + 1
                         int value = smallestNeighbor(i, j) + 1;
-                        map->setPixel8U(i, j, value);
+                        brushfireMap->setPixel8U(i, j, value);
 
                         changedPixel = true;
                     }
@@ -45,17 +41,17 @@ void Enviroment::brushFire()
 {
     list<pixel> neighbors;
 
-    for (int i = 0; i < map->getWidth(); i++)
+    for (int i = 0; i < brushfireMap->getWidth(); i++)
     {
-        for (int j = 0; j < map->getHeight(); j++)
+        for (int j = 0; j < brushfireMap->getHeight(); j++)
         {
-            int pixelValue = map->getPixelValuei(i, j, 0);
+            int pixelValue = brushfireMap->getPixelValuei(i, j, 0);
             if (pixelValue == 0)
             {
 
                 for (auto item : getAllNeighbors(i, j))
                 {
-                    if (map->getPixelValuei(item.x, item.y, 0) == 255)
+                    if (brushfireMap->getPixelValuei(item.x, item.y, 0) == 255)
                     {
                         neighbors.push_back(item);
                     }
@@ -72,14 +68,14 @@ void Enviroment::brushFire()
         neighbors.pop_front();
         
         int value = smallestNeighbor(item.x, item.y)+1;
-        map->setPixel8U(item.x, item.y, value);
+        brushfireMap->setPixel8U(item.x, item.y, value);
 
         //New neighbors
         list<pixel> allNeighbors = getAllNeighbors(item.x, item.y);
 
         for (auto neigh : allNeighbors)
         {
-            if (map->getPixelValuei(neigh.x, neigh.y, 0) == 255)
+            if (brushfireMap->getPixelValuei(neigh.x, neigh.y, 0) == 255)
             {                
                 //If element already is in queue don't add it again.
                 auto it = find_if(begin(neighbors), end(neighbors), 
@@ -96,12 +92,12 @@ list<pixel> Enviroment::wavesMeet()
 {
     list<pixel> wavesMeet;
 
-    for (int i = 0; i < map->getWidth(); i++)
+    for (int i = 0; i < brushfireMap->getWidth(); i++)
     {
-        for (int j = 0; j < map->getHeight(); j++)
+        for (int j = 0; j < brushfireMap->getHeight(); j++)
         {
             //check for bigger neighbours
-            int val = map->getPixelValuei(i, j, 0);
+            int val = brushfireMap->getPixelValuei(i, j, 0);
             
             if (val != 0 && !hasLargerNeighbor(i, j, val))
             {
@@ -115,8 +111,8 @@ list<pixel> Enviroment::wavesMeet()
 
     for (auto p : wavesMeet)
     {
-        map->setPixel8U(p.x, p.y, 255);
-        waveNodeMap->setPixel8U(p.x, p.y, 255);
+        //brushfireMap->setPixel8U(p.x, p.y, 255);
+        waveNodeMap->setPixel8U(p.x, p.y, 100);
     }
 
     return wavesMeet;
@@ -126,18 +122,18 @@ bool Enviroment::hasLargerNeighbor(int x, int y, int val)
 {
     for (int i = x - 1; i <= x + 1; i++)
     {
-        if ((i >= 0 && i < map->getWidth()))
+        if ((i >= 0 && i < brushfireMap->getWidth()))
         {
-            if (map->getPixelValuei(i, y, 0) > val)
+            if (brushfireMap->getPixelValuei(i, y, 0) > val)
                 return true;
         }
     }
 
     for (int j = y - 1; j <= y + 1; j++)
     {
-        if (j >= 0 && j < map->getHeight())
+        if (j >= 0 && j < brushfireMap->getHeight())
         {
-            if (map->getPixelValuei(x, j, 0) > val)
+            if (brushfireMap->getPixelValuei(x, j, 0) > val)
                 return true;
         }
     }
@@ -152,9 +148,9 @@ bool Enviroment::hasLargerNeighbor8(int x, int y, int val)
         for (int j = (y - 1); j <= (y + 1); j++)
         {
             //check for outof bounds
-            if ((i >= 0 && i < map->getWidth()) && (j >= 0 && j < map->getHeight()))
+            if ((i >= 0 && i < brushfireMap->getWidth()) && (j >= 0 && j < brushfireMap->getHeight()))
             {
-                if (map->getPixelValuei(i, j, 0) > val)
+                if (brushfireMap->getPixelValuei(i, j, 0) > val)
                     return true;
             }
         }
@@ -179,7 +175,7 @@ list<pixel> Enviroment::getAllNeighbors(int orgX, int orgY)
         for (int j = (orgY - 1); j <= (orgY + 1); j++)
         {
             //check for outof bounds
-            if ((i >= 0 && i < map->getWidth()) && (j >= 0 && j < map->getHeight()))
+            if ((i >= 0 && i < brushfireMap->getWidth()) && (j >= 0 && j < brushfireMap->getHeight()))
             {
                 pixel point(i,j);             
 
@@ -192,11 +188,11 @@ list<pixel> Enviroment::getAllNeighbors(int orgX, int orgY)
 
 bool Enviroment::whiteLeft()
 {
-    for (int i = 0; i < map->getWidth(); i++)
+    for (int i = 0; i < brushfireMap->getWidth(); i++)
     {
-        for (int j = 0; j < map->getHeight(); j++)
+        for (int j = 0; j < brushfireMap->getHeight(); j++)
         {
-            if (map->getPixelValuei(i, j, 0) == 255)
+            if (brushfireMap->getPixelValuei(i, j, 0) == 255)
             {
                 return true;
             }
@@ -211,7 +207,7 @@ bool Enviroment::differentNeighbors(int x, int y)
     {
         for (int j = (y - 1); j <= (y + 1); j++)
         {
-            if (map->getPixelValuei(i, j, 0) != 255)
+            if (brushfireMap->getPixelValuei(i, j, 0) != 255)
                 return true;
         }
     }
@@ -225,7 +221,7 @@ int Enviroment::smallestNeighbor(int x, int y)
     {
         for (int j = y - 1; j <= (y + 1); j++)
         {
-            int posValue = map->getPixelValuei(i, j, 0);
+            int posValue = brushfireMap->getPixelValuei(i, j, 0);
 
             if (smallest == -1 || posValue < smallest)
                 smallest = posValue;
@@ -237,11 +233,11 @@ int Enviroment::smallestNeighbor(int x, int y)
 
 void Enviroment::print()
 {
-    for (int i = 0; i < map->getHeight(); i++)
+    for (int i = 0; i < brushfireMap->getHeight(); i++)
     {
-        for (int j = 0; j < map->getWidth(); j++)
+        for (int j = 0; j < brushfireMap->getWidth(); j++)
         {
-            int posValue = map->getPixelValuei(j, i, 0);
+            int posValue = brushfireMap->getPixelValuei(j, i, 0);
             if (posValue < 10)
                 cout << "0" << posValue << ",";
             else
@@ -254,6 +250,7 @@ void Enviroment::print()
 void Enviroment::saveInternMaps()
 {
     //Saves wavesMap and other saved maps to their output files. 
+	brushfireMap->saveAsPGM("brushFireMap.pgm");
     waveNodeMap->saveAsPGM("waveNodeMap.pgm");
     inputMap->saveAsPGM("inputImage.pgm");
 }
@@ -263,4 +260,5 @@ Enviroment::~Enviroment()
     //Clean up
     delete inputMap;
     delete waveNodeMap;
+	delete brushfireMap;
 }

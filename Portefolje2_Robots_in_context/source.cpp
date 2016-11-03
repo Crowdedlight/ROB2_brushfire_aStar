@@ -32,14 +32,8 @@ int main(int argc) {
     list<pixel> wavesMeet = env.wavesMeet();
 
     std::cout << std::endl << "saving image..." << std::endl;
-    // save image
-    img->saveAsPGM("testout2.pgm");
-
-    //Save other internal maps
+    //Save maps
     env.saveInternMaps();
-        
-    // cleanup
-    delete img;
 
     system("pause");
 }

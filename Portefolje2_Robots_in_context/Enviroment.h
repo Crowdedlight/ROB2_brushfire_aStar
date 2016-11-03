@@ -35,7 +35,7 @@ public:
     ~Enviroment();
 
 private:
-    Image* map;
+    Image* brushfireMap;
     Image* inputMap;
     Image* waveNodeMap;
 
@@ -45,7 +45,7 @@ private:
     bool whiteLeft();
     bool comparePixels(pixel a, pixel b);
     bool hasLargerNeighbor(int x, int y, int val);
-    bool hasLargerNeighbor8(int x, int y, int val);
+	bool hasLargerNeighbor8(int x, int y, int val);
 
 };
 
